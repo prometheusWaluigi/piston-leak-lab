@@ -197,8 +197,18 @@ class PistonLeakODE:
         noise = self._noise_process(t)
         dN = self.params.alpha2 * P + noise - self.params.beta2 * T  # noqa: N806
         
+        # Add bounds checking to prevent entropy from becoming negative
+        # If entropy is at lower bound and derivative would push it down, zero the derivative
+        if N <= 0 and dN < 0:
+            dN = 0
+        
         # Suppression pressure dynamics (§4.1, eq 3)
         dP = self._policy_response(N, T) - self.params.delta * P  # noqa: N806
+        
+        # Add bounds checking to prevent pressure from becoming negative
+        # If pressure is at lower bound and derivative would push it down, zero the derivative
+        if P <= 0 and dP < 0:
+            dP = 0
         
         return np.array([dT, dN, dP])
     
@@ -260,9 +270,11 @@ class PistonLeakODE:
         self.times = solution.t
         self.trajectories = solution.y
         
-        # Apply bounds to trust values to ensure they stay within [0,1]
+        # Apply bounds to ensure values stay within valid ranges
         # This is a safety check in case the ODE solver steps exceeded bounds
-        self.trajectories[0] = np.clip(self.trajectories[0], 0.0, 1.0)
+        self.trajectories[0] = np.clip(self.trajectories[0], 0.0, 1.0)  # Trust in [0,1]
+        self.trajectories[1] = np.maximum(self.trajectories[1], 0.0)    # Entropy ≥ 0
+        self.trajectories[2] = np.maximum(self.trajectories[2], 0.0)    # Pressure ≥ 0
         
         # Calculate attractor metrics for each timestep
         n_steps = len(self.times)
