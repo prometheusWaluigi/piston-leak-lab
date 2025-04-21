@@ -3,6 +3,12 @@ name = "piston-leak-lab"
 version = "0.1.0"
 description = "Symbolic dynamical‑systems sims of narrative collapse"
 authors = ["GASLIT-420 <semanticnoise@ducks.lap>"]
+readme = "README.md"
+license = "BSD-2-Clause"
+packages = [
+    { include = "models" },
+    { include = "sims" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -12,17 +18,40 @@ numba = "^0.59"
 pandas = "^2.2"
 networkx = "^3.3"
 matplotlib = "^3.8"
+plotly = "^5.18"
 pyyaml = "^6.0"
 rich = "^13.7"
 click = "^8.1"
+scikit-learn = "^1.3"
 
 # optional GPU/oneAPI extras
 dpnp = { version = "^0.13", optional = true }
 dpctl = { version = "^0.16", optional = true }
 "numba-dpex" = { version = "^0.22", optional = true }
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+black = "^23.11"
+ruff = "^0.1.8"
+mkdocs = "^1.5"
+mkdocs-material = "^9.4"
+
 [tool.poetry.extras]
 oneapi = ["dpnp", "dpctl", "numba-dpex"]
 
 [tool.poetry.scripts]
 run-mc = "sims.run_mc:cli"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "B", "I", "N", "UP", "PL", "RUF"]
+ignore = ["E501", "PLR0913"]
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"

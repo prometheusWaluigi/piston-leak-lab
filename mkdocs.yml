@@ -1,0 +1,64 @@
+site_name: Piston Leak Lab
+site_description: Symbolic dynamical‑systems analysis of institutional narrative collapse
+site_author: GASLIT-420 & R.O.B.
+repo_url: https://github.com/gaslit420/piston-leak-lab
+
+theme:
+  name: material
+  palette:
+    primary: deep purple
+    accent: amber
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.top
+    - content.code.annotate
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+  logo: assets/images/logo.png
+  favicon: assets/images/favicon.png
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - footnotes
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Theory: theory.md
+  - API Documentation:
+    - Core ODE Model: api/core_ode.md
+    - Agent-Based Model: api/abm.md
+    - Monte Carlo Runner: api/run_mc.md
+    - Visualization: api/visualization.md
+  - Examples:
+    - Baseline Simulation: examples/baseline.md
+    - Parameter Sweep: examples/parameter_sweep.md
+    - Custom Transparency: examples/custom_transparency.md
+  - About:
+    - Paper & Citations: about/paper.md
+    - Contributing: about/contributing.md
+    - License: about/license.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/gaslit420/piston-leak-lab
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/gaslit420
+
+copyright: Copyright &copy; 2025 GASLIT-420 & R.O.B.

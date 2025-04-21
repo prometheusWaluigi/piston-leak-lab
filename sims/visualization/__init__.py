@@ -13,10 +13,16 @@ from .plots import (
     plot_phase_space,
     plot_rp_ratio,
     plot_collapse_heatmap,
-    plot_abm_evolution
+    plot_abm_evolution,
+    plot_attractor_metrics,
+    plot_parameter_sensitivity
 )
 
-from .dashboard import create_interactive_dashboard
+from .dashboard import (
+    create_interactive_dashboard,
+    create_parameter_explorer,
+    create_temporal_dashboard
+)
 
 __all__ = [
     'plot_trust_trajectories',
@@ -24,5 +30,9 @@ __all__ = [
     'plot_rp_ratio',
     'plot_collapse_heatmap',
     'plot_abm_evolution',
-    'create_interactive_dashboard'
+    'plot_attractor_metrics',
+    'plot_parameter_sensitivity',
+    'create_interactive_dashboard',
+    'create_parameter_explorer',
+    'create_temporal_dashboard'
 ]

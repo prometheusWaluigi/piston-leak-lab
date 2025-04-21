@@ -1,0 +1,67 @@
+# Test Monte‑Carlo config for CI pipeline
+meta:
+  description: >
+    Minimal config for CI testing with 50 runs and reduced parameters.
+  author: GASLIT‑420
+  date: 2025‑04‑20
+  version: 0.1‑test
+
+ensemble:
+  runs: 50
+  random_seed: 1337
+  run_abm: true
+  perturb_parameters: true
+  perturb_scale: 0.1
+
+time:
+  dt: 2.0           # Larger timestep for faster testing
+  t_max: 100        # Shorter timespan for faster testing
+
+parameters:
+  # ODE coefficients (see paper §4.1)
+  alpha1: 0.6       # Trust decay vs entropy
+  beta1: 0.3        # Transparency restoration boost
+  gamma1: 0.2       # Suppression penalty on trust
+
+  alpha2: 0.5       # Entropy gain from suppression
+  beta2: 0.25       # Entropy damped by rising trust
+
+  k_policy: 0.8     # Aggressiveness of narrative control
+  delta: 0.15       # Suppression fatigue rate
+
+  # Noise model
+  noise_sigma: 0.1  # Std‑dev of exogenous leak shocks
+  leak_frequency: 0.05  # Probability of a leak per timestep
+
+  # Transparency function
+  transparency_type: "adaptive"
+  base_transparency: 0.1
+  transparency_adaptivity: 0.2
+
+  # Agent‑based layer (reduced size for testing)
+  network:
+    type: watts_strogatz
+    n_agents: 500   # Reduced from 3000 for testing
+    k: 6
+    p_rewire: 0.2
+  influence_field:
+    believer_weight: 1.0
+    skeptic_weight: 1.2
+    agnostic_weight: 0.8
+
+  # Initial belief distribution
+  init_believer_prob: 0.6
+  init_skeptic_prob: 0.2
+  init_agnostic_prob: 0.2
+
+  # Collapse threshold (ε‑band overlap)
+  epsilon_overlap: 0.15
+  trust_slope_threshold: -0.05
+  entropy_critical: 1.2
+
+output:
+  path: results/test/
+  save_timeseries: false
+  save_summary: true
+  plots: true
+  interactive_dashboard: false  # Skip expensive dashboard for CI

@@ -524,6 +524,7 @@ def main():
     parser = argparse.ArgumentParser(description='Run Piston Leak Monte Carlo simulations')
     parser.add_argument('--config', type=str, required=True, help='Path to YAML config file')
     parser.add_argument('--n', type=int, help='Override number of runs')
+    parser.add_argument('--out', type=str, help='Override output directory')
     args = parser.parse_args()
     
     # Load config and potentially override number of runs
@@ -531,8 +532,16 @@ def main():
     if args.n is not None:
         mc_runner.config['ensemble']['runs'] = args.n
     
+    # Override output directory if specified
+    if args.out is not None:
+        mc_runner.config['output']['path'] = args.out
+    
     # Run simulations
     mc_runner.run_ensemble()
+
+def cli():
+    """CLI entry point for poetry script."""
+    main()
 
 if __name__ == "__main__":
     main()

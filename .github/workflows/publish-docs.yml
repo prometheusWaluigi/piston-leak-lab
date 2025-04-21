@@ -1,0 +1,64 @@
+name: publish-docs
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/publish-docs.yml'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 🔑 Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: '1.8.2'
+      
+      - name: 📦 Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --only docs
+      
+      - name: 🔧 Build docs
+        run: poetry run mkdocs build
+      
+      - name: 🔍 Verify build
+        run: |
+          test -d site || (echo "❌ Documentation build failed" && exit 1)
+          test -f site/index.html || (echo "❌ index.html not found" && exit 1)
+      
+      - name: 🚀 Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: 📤 Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'site'
+      
+      - name: 🌐 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

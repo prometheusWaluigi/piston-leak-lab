@@ -1,4 +1,4 @@
-# Piston Leak Lab
+# Piston Leak Lab
 
 > *Open‑source research forge for symbolic dynamical‑systems analysis of public‑health narratives, spike‑induced pathology, and coherence collapse.*
 
@@ -6,7 +6,7 @@
 
 ## 🧭 Project Vision
 
-**Piston Leak Lab (PLL)** investigates how tightly coupled institutional stories fracture under semantic overload—using COVID‑19 as the canonical case.  We combine:
+**Piston Leak Lab (PLL)** investigates how tightly coupled institutional stories fracture under semantic overload—using COVID‑19 as the canonical case.  We combine:
 
 - **Symbolic dynamical‑systems modeling** (ODE + agent‑based)
 - **Narrative topology & metaphoric simulators** (e.g. *Cars* universe mapping)
@@ -22,7 +22,7 @@ Everything here is BSD‑2‑Clause—fork it, remix it, cite it.
 ```
 piston-leak-lab/
 ├── README.md          # you are here
-├── papers/            # peer‑review drafts & white papers
+├── papers/            # peer‑review drafts & white papers
 │   └── piston-leak/   # v0.9 manuscript & figures
 ├── models/            # Python & Julia ODE / ABM engines
 ├── sims/              # Monte‑Carlo configs + CLI entrypoints
@@ -33,24 +33,38 @@ piston-leak-lab/
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Quick Start
 
 ```bash
 # clone
-git clone https://github.com/your‑org/piston‑leak‑lab.git && cd piston‑leak‑lab
+git clone https://github.com/gaslit420/piston‑leak‑lab.git && cd piston‑leak‑lab
 
-# create env
-python -m venv .venv && source .venv/bin/activate
-pip install -r models/requirements.txt
+# install with poetry
+poetry install
+
+# activate environment
+poetry shell
 
 # run sample simulation
-python sims/run_mc.py --config sims/baseline.yml --n 500
+run-mc --config sims/baseline.yml --n 500
+
+# or without activating shell
+poetry run run-mc --config sims/baseline.yml --n 500
 
 # build docs locally
-mkdocs serve
+poetry run mkdocs serve
 ```
 
-Requirements: **Python ≥3.11**, **Julia 1.10** (for optional high‑perf solvers), and **git‑lfs** if you intend to pull raw datasets.
+**Requirements**: 
+- **Python ≥3.11**
+- **Poetry ≥1.8** (package management)
+- **git‑lfs** (only if you want to pull the raw dataset files)
+- **Intel oneAPI** (optional, for high‑performance GPU/CPU simulations)
+
+For Intel oneAPI acceleration, install with:
+```bash
+poetry install -E oneapi
+```
 
 ---
 
@@ -58,9 +72,9 @@ Requirements: **Python ≥3.11**, **Julia 1.10** (for optional high‑perf sol
 
 | Paper | Folder | Status |
 |-------|--------|--------|
-| *Piston Leak: A Symbolic Dynamical‑Systems Model of Institutional Narrative Collapse in the Fauci Metaverse* | `papers/piston-leak` | draft v0.9 (peer‑review submission prep) |
+| *Piston Leak: A Symbolic Dynamical‑Systems Model of Institutional Narrative Collapse in the Fauci Metaverse* | `papers/piston-leak` | draft v0.9 (peer‑review submission prep) |
 
-Upcoming: *Spikeopathy Dynamics* (May 2025), *Entropy‑First Governance* (June 2025).
+Upcoming: *Spikeopathy Dynamics* (May 2025), *Entropy‑First Governance* (June 2025).
 
 ---
 
@@ -74,6 +88,25 @@ All configs are YAML‑driven; see `sims/baseline.yml` for reference.
 
 ---
 
+## 📊 Visualization & Analysis
+
+The simulation framework includes powerful visualization capabilities:
+
+- Static plots for trust trajectories, phase space, and attractor metrics
+- Interactive dashboards for parameter exploration
+- Temporal evolution analysis for collapse vs. recovery comparison
+
+Example visualization:
+
+```python
+from sims.visualization import create_interactive_dashboard
+
+# After running simulations
+create_interactive_dashboard(results, summary, "output_path/", "timestamp")
+```
+
+---
+
 ## 🤝 Contributing
 
 PRs, issues, and meme‑laden discussion welcome.  Please read `CONTRIBUTING.md` for coding style (black + ruff), DCO sign‑off, and our *zero‑gaslighting* etiquette.
@@ -84,13 +117,13 @@ If you have sensitive docs (e.g. FOIA dumps) raise an issue first—do **not** p
 
 ## 🪪 License
 
-BSD 2‑Clause.  In plain English: do what you like, credit the project, no warranty.
+BSD 2‑Clause.  In plain English: do what you like, credit the project, no warranty.
 
 ---
 
 ## 📚 Citation
 
-If you use *Piston Leak Lab* in academic work:
+If you use *Piston Leak Lab* in academic work:
 
 ```text
 @misc{gaslit420_2025_pistonleak,
@@ -98,11 +131,16 @@ If you use *Piston Leak Lab* in academic work:
   title        = {Piston Leak Lab — Symbolic Dynamical‑Systems Research Forge},
   year         = 2025,
   howpublished = {GitHub repository},
-  url          = {https://github.com/your‑org/piston‑leak‑lab}
+  url          = {https://github.com/gaslit420/piston‑leak‑lab}
 }
 ```
 
 ---
 
-*“May your entropy gradients be ever in your favor.”*
+## 🌀 Build Status
 
+[![piston‑leak‑ci](https://github.com/gaslit420/piston-leak-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/gaslit420/piston-leak-lab/actions/workflows/ci.yml)
+
+---
+
+*"May your entropy gradients be ever in your favor."*
