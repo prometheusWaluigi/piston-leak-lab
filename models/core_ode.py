@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 """
 Coupled ODE Core for Piston Leak Lab
 ====================================
@@ -13,7 +13,7 @@ See paper §4.1 for mathematical formulation.
 import numpy as np
 from scipy.integrate import solve_ivp
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Callable, Optional, Union
+from typing import Any, List, Tuple, Callable, Optional, Union
 
 
 @dataclass
@@ -70,7 +70,7 @@ class PistonLeakODE:
     
     def __init__(self, 
                  params: PistonLeakParams = None, 
-                 initial_state: Tuple[float, float, float] = (0.8, 0.2, 0.1),
+                 initial_state: tuple[float, float, float] = (0.8, 0.2, 0.1),
                  seed: int = 42):
         """
         Initialize the ODE system.
@@ -231,7 +231,7 @@ class PistonLeakODE:
             overlap > self.params.epsilon_overlap
         )
     
-    def simulate(self, t_span: Tuple[float, float], dt: float = 1.0) -> Dict:
+    def simulate(self, t_span: tuple[float, float], dt: float = 1.0) -> Dict:
         """
         Simulate the ODE system over a time span.
         

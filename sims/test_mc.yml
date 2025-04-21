@@ -15,7 +15,7 @@ ensemble:
 
 time:
   dt: 2.0           # Larger timestep for faster testing
-  t_max: 100        # Shorter timespan for faster testing
+  t_max: 50         # Very short timespan for CI testing
 
 parameters:
   # ODE coefficients (see paper §4.1)

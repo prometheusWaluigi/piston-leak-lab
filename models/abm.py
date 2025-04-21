@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 """
 Agent-Based Model for Piston Leak Lab
 =====================================
@@ -13,7 +13,7 @@ See paper §4.2 for mathematical formulation.
 import numpy as np
 import networkx as nx
 from enum import Enum, auto
-from typing import Dict, List, Tuple, Callable, Optional, Union
+from typing import Any, List, Tuple, Callable, Optional, Union
 from dataclasses import dataclass, field
 
 # Import the ODE model to enable coupling
@@ -131,7 +131,7 @@ class PistonLeakABM:
         
         return G
     
-    def _initialize_states(self) -> Dict[int, BeliefState]:
+    def _initialize_states(self) -> dict[int, BeliefState]:
         """
         Initialize agent belief states according to parameters.
         
@@ -174,7 +174,7 @@ class PistonLeakABM:
             return self.params.agnostic_weight
     
     def _calculate_energy_delta(self, node: int, new_state: BeliefState, 
-                               tnp_state: Tuple[float, float, float]) -> float:
+                               tnp_state: tuple[float, float, float]) -> float:
         """
         Calculate the energy change for a state transition.
         
@@ -239,7 +239,7 @@ class PistonLeakABM:
         T = self.params.temperature
         return base_rate * (1.0 / (1.0 + np.exp(energy_delta / T)))
     
-    def update(self, tnp_state: Tuple[float, float, float]) -> Dict:
+    def update(self, tnp_state: tuple[float, float, float]) -> Dict:
         """
         Update the agent states for one timestep.
         
@@ -302,7 +302,7 @@ class PistonLeakABM:
         
         return entropy
     
-    def get_clustering_coefficient(self) -> Dict[BeliefState, float]:
+    def get_clustering_coefficient(self) -> dict[BeliefState, float]:
         """
         Calculate clustering coefficients by belief state.
         
@@ -323,7 +323,7 @@ class PistonLeakABM:
         
         return clustering
     
-    def get_state_distribution(self) -> Dict[BeliefState, float]:
+    def get_state_distribution(self) -> dict[BeliefState, float]:
         """
         Get the current distribution of belief states.
         

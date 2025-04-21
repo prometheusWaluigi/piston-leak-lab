@@ -139,7 +139,9 @@ If you use *Piston Leak Lab* in academic work:
 
 ## 🌀 Build Status
 
-[![piston‑leak‑ci](https://github.com/gaslit420/piston-leak-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/gaslit420/piston-leak-lab/actions/workflows/ci.yml)
+[![piston‑leak‑ci](https://github.com/your-github-username/piston-leak-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/your-github-username/piston-leak-lab/actions/workflows/ci.yml)
+
+👉 *Don't forget to replace 'your-github-username' with your actual GitHub username after forking the repository.*
 
 ---
 

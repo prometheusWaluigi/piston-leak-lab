@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 """
 Interactive Dashboard for Piston Leak Lab
 =======================================
@@ -14,10 +14,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
-from typing import Dict, List, Tuple, Optional, Union, Any
+from typing import Any, List, Tuple, Optional, Union, Any
 
 
-def create_interactive_dashboard(results: List[Dict], summary: Dict, 
+def create_interactive_dashboard(results: list[Dict], summary: Dict, 
                                 output_path: str, timestamp: str):
     """
     Create an interactive HTML dashboard for exploring simulation results.
@@ -323,7 +323,7 @@ def create_interactive_dashboard(results: List[Dict], summary: Dict,
     print(f"Interactive dashboard saved to {dashboard_path}")
 
 
-def create_parameter_explorer(results: List[Dict], output_path: str, timestamp: str):
+def create_parameter_explorer(results: list[Dict], output_path: str, timestamp: str):
     """
     Create a specialized interactive parameter explorer dashboard.
     
@@ -418,7 +418,7 @@ def create_parameter_explorer(results: List[Dict], output_path: str, timestamp: 
     print(f"Parameter explorer saved to {explorer_path}")
 
 
-def create_temporal_dashboard(results: List[Dict], output_path: str, timestamp: str):
+def create_temporal_dashboard(results: list[Dict], output_path: str, timestamp: str):
     """
     Create a specialized dashboard for exploring temporal evolution.
     

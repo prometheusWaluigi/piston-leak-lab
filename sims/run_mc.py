@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 """
 Monte Carlo Simulation Runner for Piston Leak Lab
 ================================================
@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Union, Any
+from typing import Any, List, Tuple, Optional, Union, Any
 
 # Add parent directory to path for imports
 script_dir = os.path.dirname(os.path.abspath(__file__))
