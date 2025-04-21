@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 Agent-Based Model for Piston Leak Lab
 =====================================
@@ -13,14 +12,15 @@ See paper §4.2 for mathematical formulation.
 import numpy as np
 import networkx as nx
 from enum import Enum, auto
-from typing import Any, List, Tuple, Callable, Optional, Union
-from dataclasses import dataclass, field
+from typing import Any
+from collections.abc import Callable
+from dataclasses import dataclass
 
 # Import the ODE model to enable coupling
 try:
-    from .core_ode import PistonLeakODE, PistonLeakParams
+    from .core_ode import PistonLeakODE
 except ImportError:
-    from core_ode import PistonLeakODE, PistonLeakParams
+    from core_ode import PistonLeakODE
 
 
 class BeliefState(Enum):
@@ -117,19 +117,19 @@ class PistonLeakABM:
         
         if self.params.network_type == "watts_strogatz":
             # Small-world network (clustered but with shortcuts)
-            G = nx.watts_strogatz_graph(n=n, k=k, p=p, seed=self.rng.randint(1000))
+            g = nx.watts_strogatz_graph(n=n, k=k, p=p, seed=self.rng.randint(1000))
         elif self.params.network_type == "barabasi_albert":
             # Scale-free network (few hubs, many peripheral nodes)
             m = min(k, n-1)  # Can't attach to more nodes than exist
-            G = nx.barabasi_albert_graph(n=n, m=m, seed=self.rng.randint(1000))
+            g = nx.barabasi_albert_graph(n=n, m=m, seed=self.rng.randint(1000))
         elif self.params.network_type == "erdos_renyi":
             # Random network (Poisson degree distribution)
             p_edge = k / (n - 1)  # Convert mean degree to probability
-            G = nx.erdos_renyi_graph(n=n, p=p_edge, seed=self.rng.randint(1000))
+            g = nx.erdos_renyi_graph(n=n, p=p_edge, seed=self.rng.randint(1000))
         else:
             raise ValueError(f"Unknown network type: {self.params.network_type}")
         
-        return G
+        return g
     
     def _initialize_states(self) -> dict[int, BeliefState]:
         """
@@ -207,18 +207,18 @@ class PistonLeakABM:
                 neighbor_influence += neighbor_weight
         
         # Coupling to macro TNP state
-        T, N, P = tnp_state
+        t, n, p = tnp_state
         tnp_coupling = 0.0
         
         # Trust (T) makes BELIEVER state more favorable
         if new_state == BeliefState.BELIEVER:
-            tnp_coupling -= T
+            tnp_coupling -= t
         # Narrative Entropy (N) makes SKEPTIC state more favorable
         elif new_state == BeliefState.SKEPTIC:
-            tnp_coupling -= N
+            tnp_coupling -= n
         # Suppression Pressure (P) makes AGNOSTIC state more favorable
         else:  # AGNOSTIC
-            tnp_coupling -= P
+            tnp_coupling -= p
         
         # Combine influences with coupling strength
         energy_delta = neighbor_influence + self.params.coupling_strength * tnp_coupling
@@ -236,10 +236,10 @@ class PistonLeakABM:
         """
         # Base rate * Glauber formula (T-dependent sigmoid)
         base_rate = self.params.base_transition_rate
-        T = self.params.temperature
-        return base_rate * (1.0 / (1.0 + np.exp(energy_delta / T)))
+        t = self.params.temperature
+        return base_rate * (1.0 / (1.0 + np.exp(energy_delta / t)))
     
-    def update(self, tnp_state: tuple[float, float, float]) -> Dict:
+    def update(self, tnp_state: tuple[float, float, float]) -> dict:
         """
         Update the agent states for one timestep.
         
@@ -337,7 +337,7 @@ class PistonLeakABM:
         n = sum(counts.values())
         return {state: count / n for state, count in counts.items()}
     
-    def simulate(self, timesteps: int, ode_results: Dict = None) -> Dict:
+    def simulate(self, timesteps: int, ode_results: dict = None) -> dict:
         """
         Run the ABM simulation for a given number of timesteps.
         
