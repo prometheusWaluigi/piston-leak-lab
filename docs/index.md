@@ -34,6 +34,8 @@ We identify five key modes of attractor fracture:
 | **RSD** | *Recursive Suppression Disclosure* - Attempted narrative gating becomes evidence for the gated claim |
 | **MST** | *Myth of the Single Timeline* - Incompatible origin stories coexist |
 
+> **Narrative Joke:** Why did Dr. Fauci's narrative need a mechanic? Too many leaky pistons under pressure! The mechanic's diagnosis: "Severe epistemic rod knock with catastrophic truth-gasket failure."
+
 ## Getting Started
 
 Visit our [Quick Start Guide](getting-started.md) to begin running simulations with the framework.
