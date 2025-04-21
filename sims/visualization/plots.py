@@ -12,15 +12,25 @@ sensitivity analyses.
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Callable, Optional, Union, Any
-from enum import Enum
+from typing import Callable, Optional
+import sys
 
-# Make enum class available for BeliefState
-class BeliefState(Enum):
-    """Possible belief states of agents in the network."""
-    BELIEVER = 1   # Believes institutional narrative
-    SKEPTIC = 2    # Rejects institutional narrative
-    AGNOSTIC = 3   # Undecided/uncertain
+# Add parent directory to path for imports
+script_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(os.path.dirname(script_dir))
+sys.path.append(parent_dir)
+
+# Import BeliefState enum from the ABM model
+try:
+    from models.abm import BeliefState
+except ImportError:
+    # Fallback definition if import fails
+    from enum import Enum, auto
+    class BeliefState(Enum):
+        """Possible belief states of agents in the network."""
+        BELIEVER = auto()   # Believes institutional narrative
+        SKEPTIC = auto()    # Rejects institutional narrative
+        AGNOSTIC = auto()   # Undecided/uncertain
 
 
 def plot_trust_trajectories(results: list[dict], output_path: str, timestamp: str):
@@ -264,63 +274,142 @@ def plot_abm_evolution(results: list[dict], output_path: str, timestamp: str):
         output_path: Directory to save the plot
         timestamp: Timestamp for unique filename
     """
-    # Choose a representative run (median final trust)
-    final_trust = [r['ode_results']['trust'][-1] for r in results]
-    median_idx = np.argsort(final_trust)[len(final_trust) // 2]
-    result = results[median_idx]
-    
-    if result['abm_results'] is None:
+    # First verify we have results
+    if not results:
+        print("Skipping ABM evolution plot: No simulation results available")
         return
     
-    # Extract state fractions
-    times = result['abm_results']['times']
-    believer_frac = result['abm_results']['state_fractions'][BeliefState.BELIEVER]
-    skeptic_frac = result['abm_results']['state_fractions'][BeliefState.SKEPTIC]
-    agnostic_frac = result['abm_results']['state_fractions'][BeliefState.AGNOSTIC]
+    # Filter to keep only results with valid ABM data
+    valid_results = [r for r in results if r.get('abm_results') is not None]
     
-    # Plot evolution
-    plt.figure(figsize=(10, 6))
-    plt.stackplot(
-        times,
-        believer_frac,
-        skeptic_frac,
-        agnostic_frac,
-        labels=['Believer', 'Skeptic', 'Agnostic'],
-        colors=['blue', 'red', 'gray'],
-        alpha=0.7
-    )
+    if not valid_results:
+        print("Skipping ABM evolution plot: No valid ABM results available")
+        return
     
-    # Add overlay of Trust, Narrative Entropy
-    ax1 = plt.gca()
-    ax2 = ax1.twinx()
+    # Choose a representative run (median final trust)
+    final_trust = [r['ode_results']['trust'][-1] for r in valid_results]
+    median_idx = np.argsort(final_trust)[len(final_trust) // 2]
+    result = valid_results[median_idx]
     
-    ax2.plot(result['ode_results']['times'], result['ode_results']['trust'], 'k-', label='Trust (T)')
-    ax2.plot(result['ode_results']['times'], result['ode_results']['entropy'], 'k--', label='Entropy (N)')
+    # Verify that state_fractions exists
+    if 'state_fractions' not in result['abm_results']:
+        print("Skipping ABM evolution plot: No state_fractions in ABM results")
+        return
     
-    # Mark collapse point if applicable
-    if result['collapse'] and result['collapse_time'] is not None:
-        collapse_idx = np.abs(times - result['collapse_time']).argmin()
-        plt.axvline(x=times[collapse_idx], color='red', linestyle='--', alpha=0.7, 
-                   label=f'Collapse at t={result["collapse_time"]:.1f}')
+    # Create a reference to state_fractions for easier access and checks
+    state_fractions = result['abm_results']['state_fractions']
     
-    ax1.set_xlabel('Time (media cycles)')
-    ax1.set_ylabel('Population Fraction')
-    ax2.set_ylabel('T, N Values')
+    # Check if we have any data at all
+    if not state_fractions:
+        print("Skipping ABM evolution plot: Empty state_fractions")
+        return
     
-    ax1.set_ylim(0, 1)
-    ax2.set_ylim(0, 2)
-    
-    plt.title('Agent Belief State Evolution')
-    
-    # Create combined legend
-    lines1, labels1 = ax1.get_legend_handles_labels()
-    lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
-    
-    # Save plot
-    plot_path = os.path.join(output_path, f"abm_evolution_{timestamp}.png")
-    plt.savefig(plot_path, dpi=300, bbox_inches='tight')
-    plt.close()
+    # Try to find the correct keys for belief states
+    try:
+        # First attempt: Direct BeliefState enum keys
+        if all(isinstance(key, BeliefState) for key in state_fractions.keys()):
+            believer_key = BeliefState.BELIEVER
+            skeptic_key = BeliefState.SKEPTIC
+            agnostic_key = BeliefState.AGNOSTIC
+        # Second attempt: Integer enum values as keys
+        elif all(isinstance(key, int) for key in state_fractions.keys()):
+            # Get the actual integer values of enum
+            believer_key = BeliefState.BELIEVER.value 
+            skeptic_key = BeliefState.SKEPTIC.value
+            agnostic_key = BeliefState.AGNOSTIC.value
+        # Third attempt: String keys
+        elif all(isinstance(key, str) for key in state_fractions.keys()):
+            # Create mapping from string names to keys
+            key_map = {}
+            for key in state_fractions.keys():
+                upper_key = key.upper()
+                if "BELIEV" in upper_key:  # Match BELIEVER, BELIEVER, etc.
+                    key_map["BELIEVER"] = key
+                elif "SKEPT" in upper_key:  # Match SKEPTIC, SCEPTIC, etc.
+                    key_map["SKEPTIC"] = key
+                elif "AGNOST" in upper_key:  # Match AGNOSTIC, etc.
+                    key_map["AGNOSTIC"] = key
+            
+            # Use the mapped keys
+            if "BELIEVER" in key_map and "SKEPTIC" in key_map and "AGNOSTIC" in key_map:
+                believer_key = key_map["BELIEVER"]
+                skeptic_key = key_map["SKEPTIC"]
+                agnostic_key = key_map["AGNOSTIC"]
+            else:
+                # Just use the first three keys as a fallback
+                keys_list = list(state_fractions.keys())
+                if len(keys_list) >= 3:
+                    believer_key = keys_list[0]
+                    skeptic_key = keys_list[1]
+                    agnostic_key = keys_list[2]
+                else:
+                    raise KeyError("Not enough keys in state_fractions")
+        else:
+            # Mixed key types, just try to find something by position
+            keys_list = list(state_fractions.keys())
+            if len(keys_list) >= 3:
+                believer_key = keys_list[0]
+                skeptic_key = keys_list[1]
+                agnostic_key = keys_list[2]
+            else:
+                raise KeyError("Not enough keys in state_fractions")
+        
+        # Extract state fractions using the determined keys
+        times = result['abm_results']['times']
+        believer_frac = state_fractions[believer_key]
+        skeptic_frac = state_fractions[skeptic_key]
+        agnostic_frac = state_fractions[agnostic_key]
+        
+        # Plot evolution
+        plt.figure(figsize=(10, 6))
+        plt.stackplot(
+            times,
+            believer_frac,
+            skeptic_frac,
+            agnostic_frac,
+            labels=['Believer', 'Skeptic', 'Agnostic'],
+            colors=['blue', 'red', 'gray'],
+            alpha=0.7
+        )
+        
+        # Add overlay of Trust, Narrative Entropy
+        ax1 = plt.gca()
+        ax2 = ax1.twinx()
+        
+        ax2.plot(result['ode_results']['times'], result['ode_results']['trust'], 'k-', label='Trust (T)')
+        ax2.plot(result['ode_results']['times'], result['ode_results']['entropy'], 'k--', label='Entropy (N)')
+        
+        # Mark collapse point if applicable
+        if result['collapse'] and result['collapse_time'] is not None:
+            collapse_idx = np.abs(times - result['collapse_time']).argmin()
+            plt.axvline(x=times[collapse_idx], color='red', linestyle='--', alpha=0.7, 
+                       label=f'Collapse at t={result["collapse_time"]:.1f}')
+        
+        ax1.set_xlabel('Time (media cycles)')
+        ax1.set_ylabel('Population Fraction')
+        ax2.set_ylabel('T, N Values')
+        
+        ax1.set_ylim(0, 1)
+        ax2.set_ylim(0, 2)
+        
+        plt.title('Agent Belief State Evolution')
+        
+        # Create combined legend
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+        
+        # Save plot
+        plot_path = os.path.join(output_path, f"abm_evolution_{timestamp}.png")
+        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"ABM evolution plot saved to {plot_path}")
+    except Exception as e:
+        print(f"Error plotting ABM evolution: {e}")
+        if 'state_fractions' in result['abm_results']:
+            print("Available state fraction keys:", list(result['abm_results']['state_fractions'].keys()))
+        plt.close()  # Close any open figure to prevent memory leaks
 
 
 def plot_attractor_metrics(results: list[dict], output_path: str, timestamp: str):

@@ -259,10 +259,14 @@ class MonteCarloRunner:
         
         # Only run ABM if enabled
         abm_enabled = self.config['ensemble'].get('run_abm', True)
+        abm_results = None
+        
         if abm_enabled:
-            abm_results = abm_model.simulate(int(t_max / dt) + 1, ode_results)
-        else:
-            abm_results = None
+            try:
+                abm_results = abm_model.simulate(int(t_max / dt) + 1, ode_results)
+                print(f"ABM simulation completed for run {run_idx}")
+            except Exception as e:
+                print(f"Warning: ABM simulation failed for run {run_idx}: {e}")
         
         # Combine results
         results = {
@@ -355,9 +359,16 @@ class MonteCarloRunner:
                 R = self._create_transparency_function(r['run_idx'])(t, y)
                 R_values.append(R)
             
-            # Calculate R/P ratio
+            # Calculate R/P ratio with bounds
             P_values = r['ode_results']['pressure']
-            rp_ratio = np.mean(R_values) / np.mean(P_values) if np.mean(P_values) > 0 else float('inf')
+            mean_P = np.mean(P_values)
+            
+            # Prevent division by extremely small values and cap the ratio
+            if mean_P < 1e-8:
+                rp_ratio = 1000.0  # Cap at a large but finite value
+            else:
+                rp_ratio = min(np.mean(R_values) / mean_P, 1000.0)
+                
             rp_ratios.append(rp_ratio)
         
         mean_rp_ratio = np.mean(rp_ratios)
@@ -405,9 +416,15 @@ class MonteCarloRunner:
                 R = self._create_transparency_function(r['run_idx'])(t, y)
                 R_values.append(R)
             
-            # Calculate R/P ratio
+            # Calculate R/P ratio with bounds
             P_values = r['ode_results']['pressure']
-            rp_ratio = np.mean(R_values) / np.mean(P_values) if np.mean(P_values) > 0 else float('inf')
+            mean_P = np.mean(P_values)
+            
+            # Prevent division by extremely small values and cap the ratio
+            if mean_P < 1e-8:
+                rp_ratio = 1000.0  # Cap at a large but finite value
+            else:
+                rp_ratio = min(np.mean(R_values) / mean_P, 1000.0)
             rp_ratios.append(rp_ratio)
             
             # Determine if this run recovered (high final trust)
@@ -504,9 +521,14 @@ class MonteCarloRunner:
         if len(self.results) >= 100:
             plot_collapse_heatmap(self.results, output_path, timestamp)
         
-        # ABM evolution plot if ABM was run
-        if self.results[0]['abm_results'] is not None:
-            plot_abm_evolution(self.results, output_path, timestamp)
+        # ABM evolution plot if ABM was run and results are available
+        if (self.config['ensemble'].get('run_abm', True) and 
+            self.results and 
+            self.results[0].get('abm_results') is not None):
+            try:
+                plot_abm_evolution(self.results, output_path, timestamp)
+            except Exception as e:
+                print(f"Warning: Failed to generate ABM evolution plot: {e}")
         
         # Interactive dashboard if enabled
         if self.config['output'].get('interactive_dashboard', False):

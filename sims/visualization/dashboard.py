@@ -114,9 +114,12 @@ def create_interactive_dashboard(results: list[dict], summary: dict,
         color = 'rgba(255, 0, 0, 0.3)' if result['collapse'] else 'rgba(0, 0, 255, 0.3)'
         name = f"Run {i} ({'Collapse' if result['collapse'] else 'Recovery'})"
         
+        # Clip entropy to reasonable range for visualization
+        entropy_values = np.clip(result['ode_results']['entropy'], 0, 10.0)
+        
         fig.add_trace(
             go.Scatter(
-                x=result['ode_results']['entropy'],
+                x=entropy_values,
                 y=result['ode_results']['trust'],
                 mode='lines',
                 line=dict(color=color),
@@ -232,6 +235,18 @@ def create_interactive_dashboard(results: list[dict], summary: dict,
     )
     
     # Plot 6: Summary statistics table
+    # Handle large values and formatting for summary table
+    def format_value(key, value):
+        if value is None:
+            return "N/A"
+        if key == 'mean_final_entropy' and value > 1000:
+            return "Large (>1000)"
+        if key == 'mean_rp_ratio' and value > 1000:
+            return "Large (>1000)"
+        if isinstance(value, float):
+            return f"{value:.3f}"
+        return str(value)
+    
     summary_table = {
         'Metric': [
             'Total Runs',
@@ -244,14 +259,14 @@ def create_interactive_dashboard(results: list[dict], summary: dict,
             'Critical R/P Ratio'
         ],
         'Value': [
-            f"{summary['n_runs']}",
-            f"{summary['n_collapse']}",
-            f"{summary['collapse_probability']:.3f}",
-            f"{summary['mean_collapse_time']:.1f}" if summary['mean_collapse_time'] else "N/A",
-            f"{summary['mean_final_trust']:.3f}",
-            f"{summary['mean_final_entropy']:.3f}",
-            f"{summary['recovery_basin_size']:.3f}",
-            f"{summary['critical_rp_ratio']:.3f}" if summary['critical_rp_ratio'] else "N/A"
+            format_value('n_runs', summary['n_runs']),
+            format_value('n_collapse', summary['n_collapse']),
+            format_value('collapse_probability', summary['collapse_probability']),
+            format_value('mean_collapse_time', summary['mean_collapse_time']),
+            format_value('mean_final_trust', summary['mean_final_trust']),
+            format_value('mean_final_entropy', summary['mean_final_entropy']),
+            format_value('recovery_basin_size', summary['recovery_basin_size']),
+            format_value('critical_rp_ratio', summary['critical_rp_ratio'])
         ]
     }
     
