@@ -12,8 +12,8 @@ See paper §4.1 for mathematical formulation.
 import numpy as np
 from scipy.integrate import solve_ivp
 from dataclasses import dataclass
-from typing import Any
-from collections.abc import Callable
+from typing import Callable
+
 
 @dataclass
 class PistonLeakParams:
@@ -43,7 +43,7 @@ class PistonLeakParams:
     mst_scale: float = 1.0  # Myth of the Single Timeline
     
     # Collapse thresholds
-    epsilon_overlap: float = 0.15  # ε-band for FCC×RSD overlap
+    epsilon_overlap: float = 0.15  # ε-band for FCC x RSD overlap
     trust_slope_threshold: float = -0.05  # Critical dT/dt
     entropy_critical: float = 1.2  # Critical entropy threshold
     
@@ -92,14 +92,14 @@ class PistonLeakODE:
         self.attractor_metrics = None
         self.collapse_detected = False
     
-    def set_transparency_function(self, R_func: Callable[[float, np.ndarray], float]):
+    def set_transparency_function(self, r_func: Callable[[float, np.ndarray], float]):  # noqa: N803
         """
         Set the transparency function R(t, y).
         
         Args:
-            R_func: Function taking time t and state vector y, returning transparency value
+            r_func: Function taking time t and state vector y, returning transparency value
         """
-        self._R = R_func
+        self._R = r_func
     
     def _noise_process(self, t: float) -> float:
         """
@@ -131,7 +131,7 @@ class PistonLeakODE:
         Returns:
             FCC metric value
         """
-        T, N, P = y
+        T, N, P = y  # noqa: N806
         # Higher entropy and suppression increase FCC
         return self.params.fcc_scale * (N * P) / (1 + T)
     
@@ -148,11 +148,11 @@ class PistonLeakODE:
         Returns:
             RSD metric value
         """
-        T, N, P = y
+        T, N, P = y  # noqa: N806
         # RSD grows with suppression and entropy, diminishes with trust
         return self.params.rsd_scale * (P**2 * N) / (1 + T**2)
 
-    def _policy_response(self, N: float, T: float) -> float:
+    def _policy_response(self, n: float, t: float) -> float:
         """
         Institutional policy response function g(N, T).
         
@@ -160,14 +160,14 @@ class PistonLeakODE:
         entropy rises and trust falls.
         
         Args:
-            N: Current narrative entropy
-            T: Current trust level
+            n: Current narrative entropy
+            t: Current trust level
             
         Returns:
             Policy response intensity
         """
         # Suppression increases with entropy and decreases with trust
-        return self.params.k_policy * N / (0.1 + T)
+        return self.params.k_policy * n / (0.1 + t)
     
     def _system(self, t: float, y: np.ndarray) -> np.ndarray:
         """
@@ -182,18 +182,23 @@ class PistonLeakODE:
         Returns:
             Derivatives [dT/dt, dN/dt, dP/dt]
         """
-        T, N, P = y
-        R = self._R(t, y)  # Current transparency level
+        T, N, P = y  # noqa: N806
+        R = self._R(t, y)  # noqa: N806  # Current transparency level
         
         # Trust dynamics (§4.1, eq 1)
-        dT = -self.params.alpha1 * N + self.params.beta1 * R - self.params.gamma1 * P
+        dT = -self.params.alpha1 * N + self.params.beta1 * R - self.params.gamma1 * P  # noqa: N806
+        
+        # Add bounds checking to prevent trust from exceeding [0,1] range
+        # If trust is at bounds and derivative would push it out of bounds, zero the derivative
+        if (T <= 0 and dT < 0) or (T >= 1 and dT > 0):
+            dT = 0
         
         # Narrative entropy dynamics (§4.1, eq 2)
         noise = self._noise_process(t)
-        dN = self.params.alpha2 * P + noise - self.params.beta2 * T
+        dN = self.params.alpha2 * P + noise - self.params.beta2 * T  # noqa: N806
         
         # Suppression pressure dynamics (§4.1, eq 3)
-        dP = self._policy_response(N, T) - self.params.delta * P
+        dP = self._policy_response(N, T) - self.params.delta * P  # noqa: N806
         
         return np.array([dT, dN, dP])
     
@@ -210,7 +215,7 @@ class PistonLeakODE:
         Returns:
             True if collapse detected, False otherwise
         """
-        T, N, P = y
+        T, N, P = y  # noqa: N806
         
         # Calculate attractor metrics
         fcc = self._fractured_character_continuity(t, y)
@@ -255,6 +260,10 @@ class PistonLeakODE:
         self.times = solution.t
         self.trajectories = solution.y
         
+        # Apply bounds to trust values to ensure they stay within [0,1]
+        # This is a safety check in case the ODE solver steps exceeded bounds
+        self.trajectories[0] = np.clip(self.trajectories[0], 0.0, 1.0)
+        
         # Calculate attractor metrics for each timestep
         n_steps = len(self.times)
         fcc_values = np.zeros(n_steps)
@@ -292,7 +301,7 @@ class PistonLeakODE:
 if __name__ == "__main__":
     # Custom transparency function - increases with time
     def adaptive_transparency(t, y):
-        T, N, P = y
+        T, N, P = y  # noqa: N806
         # Transparency increases when entropy is high
         return 0.1 + 0.2 * N ** 2
     

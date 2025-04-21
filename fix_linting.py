@@ -3,14 +3,12 @@
 Fix common linting issues in the Piston Leak Lab codebase.
 """
 
-import os
 import re
-import sys
 from pathlib import Path
 
 def fix_file(file_path):
     """Fix linting issues in a file."""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, 'r') as f:
         content = f.read()
     
     # Remove UTF-8 encoding declaration
@@ -29,7 +27,7 @@ def fix_file(file_path):
     content = re.sub(r'from typing import Callable', 'from collections.abc import Callable', content)
     
     # Write back to file
-    with open(file_path, 'w', encoding='utf-8') as f:
+    with open(file_path, 'w') as f:
         f.write(content)
     
     print(f"Fixed: {file_path}")

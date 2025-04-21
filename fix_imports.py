@@ -6,8 +6,6 @@ This script helps transition from deprecated typing imports to modern syntax.
 
 import os
 import re
-import sys
-from pathlib import Path
 
 PYTHON_FILES = [
     "models/core_ode.py",
@@ -24,7 +22,7 @@ def fix_imports(file_path):
     """Fix imports and type annotations in a file."""
     print(f"Processing {file_path}...")
     
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, 'r') as f:
         content = f.read()
     
     # Remove UTF-8 encoding declaration
@@ -44,7 +42,7 @@ def fix_imports(file_path):
     content = re.sub(r'Union\[([^,]+), ([^]]+)\]', r'\1 | \2', content)
     
     # Write updated content
-    with open(file_path, 'w', encoding='utf-8') as f:
+    with open(file_path, 'w') as f:
         f.write(content)
     
     print(f"  ✓ Fixed imports in {file_path}")

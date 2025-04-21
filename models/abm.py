@@ -12,8 +12,7 @@ See paper §4.2 for mathematical formulation.
 import numpy as np
 import networkx as nx
 from enum import Enum, auto
-from typing import Any
-from collections.abc import Callable
+from typing import Optional
 from dataclasses import dataclass
 
 # Import the ODE model to enable coupling
@@ -57,15 +56,27 @@ class ABMParams:
     coupling_strength: float = 0.3  # How strongly agents respond to macro state
     
     def __post_init__(self):
-        """Validate parameter constraints."""
+        """Validate parameter constraints and normalize probabilities if needed."""
         assert self.n_agents > 0, "Number of agents must be positive"
         assert self.k < self.n_agents, "Mean degree must be less than n_agents"
         assert 0 <= self.p_rewire <= 1, "Rewiring probability must be in [0,1]"
-        assert (
-            self.init_believer_prob + 
-            self.init_skeptic_prob + 
-            self.init_agnostic_prob
-        ) == 1.0, "Initial state probabilities must sum to 1"
+        
+        # Ensure all probabilities are non-negative
+        self.init_believer_prob = max(0.0, self.init_believer_prob)
+        self.init_skeptic_prob = max(0.0, self.init_skeptic_prob)
+        self.init_agnostic_prob = max(0.0, self.init_agnostic_prob)
+        
+        # Normalize probabilities to sum to 1.0
+        total = self.init_believer_prob + self.init_skeptic_prob + self.init_agnostic_prob
+        if total > 0:
+            self.init_believer_prob /= total
+            self.init_skeptic_prob /= total
+            self.init_agnostic_prob /= total
+        else:
+            # Default distribution if all were zero
+            self.init_believer_prob = 0.6
+            self.init_skeptic_prob = 0.2
+            self.init_agnostic_prob = 0.2
 
 
 class PistonLeakABM:
@@ -337,7 +348,7 @@ class PistonLeakABM:
         n = sum(counts.values())
         return {state: count / n for state, count in counts.items()}
     
-    def simulate(self, timesteps: int, ode_results: dict = None) -> dict:
+    def simulate(self, timesteps: int, ode_results: Optional[dict] = None) -> dict:
         """
         Run the ABM simulation for a given number of timesteps.
         
@@ -354,9 +365,9 @@ class PistonLeakABM:
         
         # Extract TNP trajectories
         times = ode_results['times']
-        T = ode_results['trust']
-        N = ode_results['entropy']
-        P = ode_results['pressure']
+        trust = ode_results['trust']
+        entropy = ode_results['entropy']
+        pressure = ode_results['pressure']
         
         # Ensure we have enough ODE timesteps
         assert len(times) >= timesteps, "Not enough ODE timesteps for ABM simulation"
@@ -367,7 +378,7 @@ class PistonLeakABM:
         
         # Run ABM for each timestep
         for t in range(timesteps):
-            tnp_state = (T[t], N[t], P[t])
+            tnp_state = (trust[t], entropy[t], pressure[t])
             self.update(tnp_state)
         
         # Calculate state distributions over time
