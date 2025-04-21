@@ -17,7 +17,8 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Tuple, Optional, Union, Any
+from typing import Any, Optional
+from collections.abc import Callable
 
 # Add parent directory to path for imports
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -71,7 +72,7 @@ class MonteCarloRunner:
         self.results = []
         self.summary = {}
     
-    def _load_config(self) -> Dict:
+    def _load_config(self) -> dict:
         """
         Load the YAML configuration file.
         
@@ -177,7 +178,7 @@ class MonteCarloRunner:
         
         return abm_params
     
-    def _create_transparency_function(self, run_idx: int):
+    def _create_transparency_function(self, run_idx: int) -> Callable:
         """
         Create a transparency function for this run.
         
@@ -219,7 +220,7 @@ class MonteCarloRunner:
             # Default to constant transparency
             return lambda t, y: 0.1
     
-    def _run_single_simulation(self, run_idx: int) -> Dict:
+    def _run_single_simulation(self, run_idx: int) -> dict:
         """
         Run a single simulation with the given parameters.
         
@@ -381,12 +382,12 @@ class MonteCarloRunner:
         for k, v in self.summary.items():
             print(f"  {k}: {v}")
     
-    def _estimate_critical_rp_ratio(self) -> float:
+    def _estimate_critical_rp_ratio(self) -> Optional[float]:
         """
         Estimate the critical R/P ratio separating recovery and collapse basins.
         
         Returns:
-            Estimated critical R/P ratio
+            Estimated critical R/P ratio or None if no boundary found
         """
         # Calculate R/P ratio for each run
         rp_ratios = []
@@ -518,6 +519,7 @@ class MonteCarloRunner:
         
         print(f"Plots saved to {output_path}")
 
+
 # Main entry point
 def main():
     """Main entry point for command-line execution."""
@@ -539,9 +541,11 @@ def main():
     # Run simulations
     mc_runner.run_ensemble()
 
+
 def cli():
     """CLI entry point for poetry script."""
     main()
+
 
 if __name__ == "__main__":
     main()

@@ -12,7 +12,7 @@ sensitivity analyses.
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Any, List, Tuple, Callable, Optional, Union, Any
+from typing import Callable, Optional, Union, Any
 from enum import Enum
 
 # Make enum class available for BeliefState
@@ -23,7 +23,7 @@ class BeliefState(Enum):
     AGNOSTIC = 3   # Undecided/uncertain
 
 
-def plot_trust_trajectories(results: list[Dict], output_path: str, timestamp: str):
+def plot_trust_trajectories(results: list[dict], output_path: str, timestamp: str):
     """
     Plot trust trajectories for all runs, colored by collapse.
     
@@ -65,7 +65,7 @@ def plot_trust_trajectories(results: list[Dict], output_path: str, timestamp: st
     plt.close()
 
 
-def plot_phase_space(results: list[Dict], output_path: str, timestamp: str):
+def plot_phase_space(results: list[dict], output_path: str, timestamp: str):
     """
     Plot phase space (Trust vs Entropy) with coloring by collapse.
     
@@ -108,7 +108,7 @@ def plot_phase_space(results: list[Dict], output_path: str, timestamp: str):
     plt.close()
 
 
-def plot_rp_ratio(results: list[Dict], transparency_func: Callable, 
+def plot_rp_ratio(results: list[dict], transparency_func: Callable, 
                  output_path: str, timestamp: str):
     """
     Plot R/P ratio vs final trust to visualize basin boundary.
@@ -207,7 +207,7 @@ def plot_rp_ratio(results: list[Dict], transparency_func: Callable,
     plt.close()
 
 
-def plot_collapse_heatmap(results: list[Dict], output_path: str, timestamp: str):
+def plot_collapse_heatmap(results: list[dict], output_path: str, timestamp: str):
     """
     Plot collapse probability heatmap as function of parameters.
     
@@ -255,7 +255,7 @@ def plot_collapse_heatmap(results: list[Dict], output_path: str, timestamp: str)
     plt.close()
 
 
-def plot_abm_evolution(results: list[Dict], output_path: str, timestamp: str):
+def plot_abm_evolution(results: list[dict], output_path: str, timestamp: str):
     """
     Plot ABM belief state evolution over time.
     
@@ -323,7 +323,7 @@ def plot_abm_evolution(results: list[Dict], output_path: str, timestamp: str):
     plt.close()
 
 
-def plot_attractor_metrics(results: list[Dict], output_path: str, timestamp: str):
+def plot_attractor_metrics(results: list[dict], output_path: str, timestamp: str):
     """
     Plot attractor metrics (FCC, RSD, overlap) over time.
     
@@ -354,7 +354,7 @@ def plot_attractor_metrics(results: list[Dict], output_path: str, timestamp: str
     
     ax1.plot(times, fcc, 'b-', label='FCC', alpha=0.7)
     ax1.plot(times, rsd, 'r-', label='RSD', alpha=0.7)
-    ax1.plot(times, overlap, 'g-', label='FCC×RSD ε-band', alpha=0.7)
+    ax1.plot(times, overlap, 'g-', label='FCC x RSD ε-band', alpha=0.7)
     
     # Mark collapse point if applicable
     if collapse_run['collapse_time'] is not None:
@@ -386,7 +386,7 @@ def plot_attractor_metrics(results: list[Dict], output_path: str, timestamp: str
     
     ax2.plot(times, fcc, 'b-', label='FCC', alpha=0.7)
     ax2.plot(times, rsd, 'r-', label='RSD', alpha=0.7)
-    ax2.plot(times, overlap, 'g-', label='FCC×RSD ε-band', alpha=0.7)
+    ax2.plot(times, overlap, 'g-', label='FCC x RSD ε-band', alpha=0.7)
     
     # Add critical overlap threshold
     ax2.axhline(y=0.15, color='k', linestyle=':', alpha=0.7, label='ε-threshold')
@@ -412,7 +412,7 @@ def plot_attractor_metrics(results: list[Dict], output_path: str, timestamp: str
     plt.close()
 
 
-def plot_parameter_sensitivity(results: list[Dict], output_path: str, timestamp: str):
+def plot_parameter_sensitivity(results: list[dict], output_path: str, timestamp: str):
     """
     Plot parameter sensitivity analysis for key parameters.
     
