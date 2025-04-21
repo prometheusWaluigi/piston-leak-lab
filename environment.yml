@@ -1,0 +1,13 @@
+name: pll-oneapi
+channels:
+  - intel
+  - conda-forge
+dependencies:
+  - intel::intel-oneapi-mkl
+  - intel::intel-oneapi-tbb
+  - intel::intel-oneapi-dpcpp
+  - pip
+  - python=3.11
+# poetry will create a venv inside this conda env
+  - pip:
+      - poetry>=1.8

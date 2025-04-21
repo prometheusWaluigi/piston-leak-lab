@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "piston-leak-lab"
+version = "0.1.0"
+description = "Symbolic dynamical‑systems sims of narrative collapse"
+authors = ["GASLIT-420 <semanticnoise@ducks.lap>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26"
+scipy = "^1.11"
+numba = "^0.59"
+pandas = "^2.2"
+networkx = "^3.3"
+matplotlib = "^3.8"
+pyyaml = "^6.0"
+rich = "^13.7"
+click = "^8.1"
+
+# optional GPU/oneAPI extras
+dpnp = { version = "^0.13", optional = true }
+dpctl = { version = "^0.16", optional = true }
+"numba-dpex" = { version = "^0.22", optional = true }
+
+[tool.poetry.extras]
+oneapi = ["dpnp", "dpctl", "numba-dpex"]
+
+[tool.poetry.scripts]
+run-mc = "sims.run_mc:cli"

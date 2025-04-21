@@ -1,0 +1,54 @@
+```yaml
+# Baseline Monte‑Carlo config for Piston Leak ODE + ABM simulation
+meta:
+  description: >
+    500‑run ensemble, default parameters derived from draft v0.9.
+  author: GASLIT‑420
+  date: 2025‑04‑20
+  version: 0.1
+
+ensemble:
+  runs: 500
+  random_seed: 42         # because Hitchhiker’s
+
+time:
+  dt: 1.0                 # one timestep = one media cycle (~1 day)
+  t_max: 365              # one pandemic year
+
+parameters:
+  # ODE coefficients (see paper §4.1)
+  alpha1: 0.6             # Trust decay vs entropy
+  beta1: 0.3              # Transparency restoration boost
+  gamma1: 0.2             # Suppression penalty on trust
+
+  alpha2: 0.5             # Entropy gain from suppression
+  beta2: 0.25             # Entropy damped by rising trust
+
+  k_policy: 0.8           # Aggressiveness of narrative control
+  delta: 0.15             # Suppression fatigue rate
+
+  # Noise model
+  noise_sigma: 0.1        # Std‑dev of exogenous leak shocks
+  leak_frequency: 0.05    # Probability of a leak per timestep
+
+  # Agent‑based layer
+  network:
+    type: watts_strogatz
+    n_agents: 3000
+    k: 6
+    p_rewire: 0.2
+  influence_field:
+    believer_weight: 1.0
+    skeptic_weight: 1.2
+    agnostic_weight: 0.8
+
+  # Collapse threshold (ε‑band overlap)
+  epsilon_overlap: 0.15
+  trust_slope_threshold: -0.05
+  entropy_critical: 1.2
+
+output:
+  path: results/baseline/
+  save_timeseries: true
+  save_summary: true
+  plots: true
