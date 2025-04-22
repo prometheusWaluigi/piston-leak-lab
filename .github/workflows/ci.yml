@@ -65,10 +65,4 @@ jobs:
           name: smoke_test_results
           path: smoke_test/
 
-      # ---------- Humor gate ----------
-      - name: 🤡 Humor gate
-        run: |
-          if grep -R --ignore-case -n "todo-joke-here" *.md docs || true; then
-            echo "::error::Humorless TODO detected. Insert memes before merge."
-            exit 1
-          fi
+      # Humor gate removed to fix CI pipeline
