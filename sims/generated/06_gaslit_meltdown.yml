@@ -1,0 +1,39 @@
+meta:
+  description: "GASLIT\u2011AF Meltdown (Entropy Surge + Genetic Fragility)"
+  author: GASLIT-420
+  date: '2025-04-21'
+  version: 0.1.6
+  parent_baseline: baseline.yml
+ensemble:
+  runs: 500
+  random_seed: 42
+time:
+  dt: 1.0
+  t_max: 365
+parameters:
+  alpha1: 0.8
+  beta1: 0.3
+  gamma1: 0.2
+  alpha2: 0.5
+  beta2: 0.15
+  k_policy: 0.8
+  delta: 0.15
+  noise_sigma: 0.2
+  leak_frequency: 0.15
+  network:
+    type: watts_strogatz
+    n_agents: 3000
+    k: 6
+    p_rewire: 0.2
+  influence_field:
+    believer_weight: 1.0
+    skeptic_weight: 1.2
+    agnostic_weight: 0.8
+  epsilon_overlap: 0.15
+  trust_slope_threshold: -0.05
+  entropy_critical: 0.9
+output:
+  path: results/baseline/
+  save_timeseries: true
+  save_summary: true
+  plots: true

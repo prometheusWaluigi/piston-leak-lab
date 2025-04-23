@@ -1,9 +1,9 @@
-# Baseline Monte-Carlo config for Piston Leak ODE + ABM simulation
+# Cyclic Transparency Monte-Carlo config for Piston Leak ODE + ABM simulation
 meta:
   description: >
-    500-run ensemble, default parameters derived from draft v0.9.
+    500-run ensemble, transparency oscillates over time (cyclic disclosure pattern)
   author: GASLIT-420
-  date: 2025-04-20
+  date: 2025-04-21
   version: 0.1
 
 ensemble:
@@ -30,6 +30,12 @@ parameters:
   noise_sigma: 0.1        # Std-dev of exogenous leak shocks
   leak_frequency: 0.05    # Probability of a leak per timestep
 
+  # Transparency function
+  transparency_type: "cyclic"
+  cycle_period: 30        # 30-day cycle
+  min_transparency: 0.05  # Minimum transparency
+  max_transparency: 0.30  # Maximum transparency
+
   # Agent-based layer
   network:
     type: watts_strogatz
@@ -47,7 +53,7 @@ parameters:
   entropy_critical: 1.2
 
 output:
-  path: results/baseline/
+  path: results/transparency_cyclic/
   save_timeseries: true
   save_summary: true
   plots: true

@@ -1,9 +1,9 @@
-# Baseline Monte-Carlo config for Piston Leak ODE + ABM simulation
+# Delayed Transparency Monte-Carlo config for Piston Leak ODE + ABM simulation
 meta:
   description: >
-    500-run ensemble, default parameters derived from draft v0.9.
+    500-run ensemble, transparency increases after time threshold (delayed disclosure)
   author: GASLIT-420
-  date: 2025-04-20
+  date: 2025-04-21
   version: 0.1
 
 ensemble:
@@ -30,6 +30,12 @@ parameters:
   noise_sigma: 0.1        # Std-dev of exogenous leak shocks
   leak_frequency: 0.05    # Probability of a leak per timestep
 
+  # Transparency function
+  transparency_type: "delayed"
+  transparency_delay: 100
+  before_transparency: 0.05
+  after_transparency: 0.3
+
   # Agent-based layer
   network:
     type: watts_strogatz
@@ -47,7 +53,7 @@ parameters:
   entropy_critical: 1.2
 
 output:
-  path: results/baseline/
+  path: results/transparency_delayed/
   save_timeseries: true
   save_summary: true
   plots: true

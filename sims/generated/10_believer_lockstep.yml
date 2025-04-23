@@ -1,0 +1,39 @@
+meta:
+  description: "Believer Lockstep (Echo\u2011Chamber Stress)"
+  author: GASLIT-420
+  date: '2025-04-21'
+  version: 0.1.10
+  parent_baseline: baseline.yml
+ensemble:
+  runs: 500
+  random_seed: 42
+time:
+  dt: 1.0
+  t_max: 365
+parameters:
+  alpha1: 0.6
+  beta1: 0.3
+  gamma1: 0.2
+  alpha2: 0.5
+  beta2: 0.25
+  k_policy: 0.8
+  delta: 0.15
+  noise_sigma: 0.1
+  leak_frequency: 0.05
+  network:
+    type: erdos_renyi
+    n_agents: 2500
+    k: 8
+    p_rewire: 0.2
+  influence_field:
+    believer_weight: 1.4
+    skeptic_weight: 0.8
+    agnostic_weight: 0.6
+  epsilon_overlap: 0.15
+  trust_slope_threshold: -0.05
+  entropy_critical: 1.2
+output:
+  path: results/baseline/
+  save_timeseries: true
+  save_summary: true
+  plots: true

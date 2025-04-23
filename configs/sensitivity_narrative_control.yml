@@ -1,21 +1,24 @@
-# Baseline Monte-Carlo config for Piston Leak ODE + ABM simulation
+# Narrative Control Sensitivity Monte-Carlo config for Piston Leak ODE + ABM simulation
 meta:
   description: >
-    500-run ensemble, default parameters derived from draft v0.9.
+    Parameter sweep of aggressiveness of narrative control (k_policy)
   author: GASLIT-420
-  date: 2025-04-20
+  date: 2025-04-21
   version: 0.1
 
 ensemble:
-  runs: 500
-  random_seed: 42         # because Hitchhiker's
+  runs: 100
+  random_seed: 42
+  parameter_sweep: true
+  sweep_parameter: "k_policy"
+  sweep_values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5]
 
 time:
   dt: 1.0                 # one timestep = one media cycle (~1 day)
   t_max: 365              # one pandemic year
 
 parameters:
-  # ODE coefficients (see paper §4.1)
+  # ODE coefficients (k_policy will be overridden by sweep)
   alpha1: 0.6             # Trust decay vs entropy
   beta1: 0.3              # Transparency restoration boost
   gamma1: 0.2             # Suppression penalty on trust
@@ -47,7 +50,8 @@ parameters:
   entropy_critical: 1.2
 
 output:
-  path: results/baseline/
+  path: results/sensitivity_narrative_control/
   save_timeseries: true
   save_summary: true
   plots: true
+  parameter_heatmap: true

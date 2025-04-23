@@ -1,21 +1,24 @@
-# Baseline Monte-Carlo config for Piston Leak ODE + ABM simulation
+# Transparency Boost Sensitivity Monte-Carlo config for Piston Leak ODE + ABM simulation
 meta:
   description: >
-    500-run ensemble, default parameters derived from draft v0.9.
+    Parameter sweep of transparency restoration boost (beta1)
   author: GASLIT-420
-  date: 2025-04-20
+  date: 2025-04-21
   version: 0.1
 
 ensemble:
-  runs: 500
-  random_seed: 42         # because Hitchhiker's
+  runs: 100
+  random_seed: 42
+  parameter_sweep: true
+  sweep_parameter: "beta1"
+  sweep_values: [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
 
 time:
   dt: 1.0                 # one timestep = one media cycle (~1 day)
   t_max: 365              # one pandemic year
 
 parameters:
-  # ODE coefficients (see paper §4.1)
+  # ODE coefficients (beta1 will be overridden by sweep)
   alpha1: 0.6             # Trust decay vs entropy
   beta1: 0.3              # Transparency restoration boost
   gamma1: 0.2             # Suppression penalty on trust
@@ -47,7 +50,8 @@ parameters:
   entropy_critical: 1.2
 
 output:
-  path: results/baseline/
+  path: results/sensitivity_transparency_boost/
   save_timeseries: true
   save_summary: true
   plots: true
+  parameter_heatmap: true
