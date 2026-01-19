@@ -45,11 +45,14 @@ poetry install
 # activate environment
 poetry shell
 
-# run sample simulation
-run-mc --config sims/baseline.yml --n 500
+# run a quick sample simulation (smaller ensemble)
+run-mc --config sims/baseline.yml --n 25 --out results/quickstart/
 
 # or without activating shell
-poetry run run-mc --config sims/baseline.yml --n 500
+poetry run run-mc --config sims/baseline.yml --n 25 --out results/quickstart/
+
+# full baseline run (takes longer)
+poetry run run-mc --config sims/baseline.yml --n 500 --out results/baseline/
 
 # build docs locally
 poetry run mkdocs serve
