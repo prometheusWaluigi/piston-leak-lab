@@ -327,8 +327,11 @@ class PistonLeakABM:
         clustering = {}
         for state, nodes in state_nodes.items():
             if nodes:
-                subgraph = self.network.subgraph(nodes)
-                clustering[state] = nx.average_clustering(subgraph)
+                subgraph = self.network.subgraph(nodes).copy()
+                if subgraph.number_of_nodes() < 2:
+                    clustering[state] = 0.0
+                else:
+                    clustering[state] = nx.average_clustering(subgraph)
             else:
                 clustering[state] = 0.0
         
